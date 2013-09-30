@@ -42,3 +42,5 @@ module EstoreConventions
   end
 
 end
+
+require_relative 'estore_conventions/builder'
