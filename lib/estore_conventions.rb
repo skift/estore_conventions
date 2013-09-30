@@ -33,9 +33,6 @@ module EstoreConventions
 
   end
 
-
-
-
   def timestamp_attributes_for_create
     super << :rails_created_at
   end
