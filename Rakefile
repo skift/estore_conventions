@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "estore_conventions"
   gem.homepage = "http://github.com/andrewcallahan/estore_conventions"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = "abstracting out things"
+  gem.description = "abstracting out things"
   gem.email = "andrew.callahan@gmail.com"
   gem.authors = ["Andrew Callahan"]
   # dependencies defined in Gemfile
