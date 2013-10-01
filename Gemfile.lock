@@ -1,14 +1,18 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    activesupport (4.0.0)
+    actionmailer (0.6.1)
+      actionpack (>= 0.9.5)
+    actionpack (1.4.0)
+    activerecord (1.6.0)
+    activesupport (3.2.14)
       i18n (~> 0.6, >= 0.6.4)
-      minitest (~> 4.2)
-      multi_json (~> 1.3)
-      thread_safe (~> 0.1)
-      tzinfo (~> 0.3.37)
+      multi_json (~> 1.0)
+    acts-as-taggable-on (2.1.1)
+      rails
     addressable (2.3.5)
-    atomic (1.1.14)
+    aggtive_record (0.0.1)
+      activesupport (~> 3.2.14)
     builder (3.2.2)
     faraday (0.8.8)
       multipart-post (~> 1.2.0)
@@ -36,7 +40,6 @@ GEM
     json (1.8.0)
     jwt (0.1.8)
       multi_json (>= 1.5)
-    minitest (4.7.5)
     multi_json (1.8.0)
     multi_xml (0.5.5)
     multipart-post (1.2.0)
@@ -49,6 +52,11 @@ GEM
       multi_xml (~> 0.5)
       rack (~> 1.2)
     rack (1.5.2)
+    rails (0.9.5)
+      actionmailer (>= 0.6.1)
+      actionpack (>= 1.4.0)
+      activerecord (>= 1.6.0)
+      rake (>= 0.4.15)
     rake (10.1.0)
     rcov (0.9.11)
     rdoc (3.12.2)
@@ -59,14 +67,13 @@ GEM
     shoulda-context (1.1.5)
     shoulda-matchers (2.4.0)
       activesupport (>= 3.0.0)
-    thread_safe (0.1.3)
-      atomic
-    tzinfo (0.3.37)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  acts-as-taggable-on
+  aggtive_record
   bundler (~> 1.0)
   jeweler (~> 1.8.7)
   rcov (= 0.9.11)
