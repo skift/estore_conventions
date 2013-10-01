@@ -1,4 +1,7 @@
 require 'aggtive_record'
+require 'acts-as-taggable-on'
+ActsAsTaggableOn.force_lowercase = true
+
 
 module EstoreConventions     
   extend ActiveSupport::Concern
