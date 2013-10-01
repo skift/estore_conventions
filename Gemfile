@@ -11,4 +11,7 @@ group :development do
   gem "bundler", "~> 1.0"
   gem "jeweler", "~> 1.8.7"
   gem "rcov", '0.9.11'
+  gem "acts-as-taggable-on"
+  gem "aggtive_record"
+
 end
