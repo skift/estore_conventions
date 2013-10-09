@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "estore_conventions"
-  s.version = "0.1.7"
+  s.version = "0.1.8"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Andrew Callahan"]
-  s.date = "2013-10-01"
+  s.date = "2013-10-09"
   s.description = "abstracting out things"
   s.email = "andrew.callahan@gmail.com"
   s.extra_rdoc_files = [
@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".document",
+    ".ruby-version",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
