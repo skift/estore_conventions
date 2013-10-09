@@ -36,31 +36,29 @@ module EstoreConventions
 
   end
 
-  module InstanceMethods
-    def archived_attribute(attribute, time_frame=(30.days))
-      # normalize time since we are returning today as a whole day
-      time_frame = (DateTime.now + 1.day).beginning_of_day - time_frame
+  def archived_attribute(attribute, time_frame=(30.days))
+    # normalize time since we are returning today as a whole day
+    time_frame = (DateTime.now + 1.day).beginning_of_day - time_frame
 
-      # transform papertrail objects to reify objects
-      a = self.versions.map {|v| v.reify }
+    # transform papertrail objects to reify objects
+    a = self.versions.map {|v| v.reify }
 
-      # get rid of nil first version
-      a.compact!
+    # get rid of nil first version
+    a.compact!
 
-      # add the current object to the array
-      a << self
+    # add the current object to the array
+    a << self
 
-      # weed out old entries
-      a.delete_if {|x| x.rails_updated_at <= time_frame }
+    # weed out old entries
+    a.delete_if {|x| x.rails_updated_at <= time_frame }
 
-      # sort hash based on key  
-      a.sort_by!{|x| x.rails_updated_at }
+    # sort hash based on key  
+    a.sort_by!{|x| x.rails_updated_at }
 
-      # transform reify objects into hash of {date => value}
-      a.reduce({}) do |hsh,val|
-        hsh[val.rails_updated_at.strftime('%Y-%m-%d')] = val.send(attribute)
-        hsh
-      end
+    # transform reify objects into hash of {date => value}
+    a.reduce({}) do |hsh,val|
+      hsh[val.rails_updated_at.strftime('%Y-%m-%d')] = val.send(attribute)
+      hsh
     end
   end
 
