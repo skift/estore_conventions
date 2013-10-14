@@ -1,5 +1,7 @@
 require 'aggtive_record'
 require 'acts-as-taggable-on'
+require 'paper_trail'
+
 ActsAsTaggableOn.force_lowercase = true
 
 
@@ -8,12 +10,29 @@ module EstoreConventions
   include AggtiveRecord::Aggable
 
   included do
-    validates_presence_of :t_id
-    validates_uniqueness_of :t_id
+    class_attribute :t_id_attribute
+
+    self.t_id_attribute = :t_id  # by default
+    validates_presence_of self.t_id_attribute
+    validates_uniqueness_of self.t_id_attribute
   end
 
 
+  # instance methods
+
+
+
   module ClassMethods
+    def find_or_init_by_t_id(tid)
+       where(:t_id => tid).first_or_initialize
+    end
+
+
+    def attr_t_id(attname)
+      puts "WARNING: Customizing t_id and proper validation is not supported yet"
+      raise ArgumentError unless column_names.include?(attname.to_s)
+      self.t_id_attribute = attname 
+    end
 
     def add_sorted_value_and_sort(foo, opts={})
 
