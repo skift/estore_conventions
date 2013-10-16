@@ -14,6 +14,9 @@ gem "aggtive_record"
 # For being associated with with content blobs in the database
 gem "active_record_content_blob"
 
+gem 'paper_trail'
+
+
 
 group :development, :test do
   gem "bundler", "~> 1.0"
@@ -23,5 +26,4 @@ group :development, :test do
   gem "pry"
   gem "database_cleaner"
   gem 'rails', "~> 3.2.14"
-  gem 'paper_trail'
 end

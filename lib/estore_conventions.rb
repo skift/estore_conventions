@@ -9,12 +9,15 @@ module EstoreConventions
   extend ActiveSupport::Concern
   include AggtiveRecord::Aggable
 
+
+
   included do
     class_attribute :t_id_attribute
 
     self.t_id_attribute = :t_id  # by default
     validates_presence_of self.t_id_attribute
     validates_uniqueness_of self.t_id_attribute
+
   end
 
 

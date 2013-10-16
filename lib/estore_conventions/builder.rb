@@ -1,5 +1,10 @@
 module EstoreConventions
   module Builder
+    ## IN THE PROCESS OF DEPRECATION - 10/16
+
+
+
+    
 
     # expects: class has a .find_or_init_by_t_id
     # klass is a class name, like MusicRecord
