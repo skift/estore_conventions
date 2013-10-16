@@ -20,11 +20,28 @@ module EstoreConventions
 
   # instance methods
 
-
-
   module ClassMethods
     def find_or_init_by_t_id(tid)
        where(:t_id => tid).first_or_initialize
+    end
+
+    # atts_hash are the attributes to assign to the Record
+    # identifier_conditions is what the scope for first_or_initialize is called upon
+    #  so that an existing object is updated
+    #  full_data_object is passed in to be saved as a blob
+    def factory_build_for_store(atts_hash, identifier_conditions = {}, full_data_object={}, &blk)      
+      if identifier_conditions.empty?
+        record = self.new
+      else
+        record = self.where(identifier_conditions).first_or_initialize
+      end
+      record.assign_attributes(atts_hash)
+
+      if block_given?
+        yield record, full_data_object
+      end
+
+      return record
     end
 
 
@@ -35,7 +52,6 @@ module EstoreConventions
     end
 
     def add_sorted_value_and_sort(foo, opts={})
-
       if foo.class == Proc 
         self.all.sort_by do |channel| 
           val = foo.call(channel) 
@@ -53,7 +69,17 @@ module EstoreConventions
       end
     end
 
-  end
+
+
+
+
+
+
+  end ##### ClassMethods
+
+
+
+  ############ InstanceMethods
 
   def archived_attribute(attribute, time_frame=(30.days))
     # normalize time since we are returning today as a whole day

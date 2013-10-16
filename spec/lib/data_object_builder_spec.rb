@@ -9,7 +9,6 @@ describe EstoreConventions::Builder do
       an_unused_attribute: "N/A" }
     # note, Builder passes in both the original data object AND the derived attributes hash
     @attributes_hash = @data_object.reject{|k,v| k == :an_unused_attribute || k == :id}
-
   end
 
   let(:builder){ EstoreConventions::Builder }
@@ -50,6 +49,7 @@ describe EstoreConventions::Builder do
       expect(new_record).to be_new_record
     end
   end
+
 
 end
 
