@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "estore_conventions"
-  s.version = "0.1.9"
+  s.version = "0.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Andrew Callahan"]
-  s.date = "2013-10-09"
+  s.date = "2013-10-16"
   s.description = "abstracting out things"
   s.email = "andrew.callahan@gmail.com"
   s.extra_rdoc_files = [
@@ -18,7 +18,6 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".document",
-    ".ruby-version",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
@@ -28,13 +27,16 @@ Gem::Specification.new do |s|
     "estore_conventions.gemspec",
     "lib/estore_conventions.rb",
     "lib/estore_conventions/builder.rb",
-    "test/helper.rb",
-    "test/test_estore_conventions.rb"
+    "spec/lib/data_object_builder_spec.rb",
+    "spec/lib/factory_build_for_store_spec.rb",
+    "spec/lib/sorted_values_spec.rb",
+    "spec/lib/t_id_spec.rb",
+    "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/andrewcallahan/estore_conventions"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "2.0.3"
+  s.rubygems_version = "2.0.5"
   s.summary = "abstracting out things"
 
   if s.respond_to? :specification_version then
@@ -43,28 +45,40 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<acts-as-taggable-on>, [">= 0"])
       s.add_runtime_dependency(%q<aggtive_record>, [">= 0"])
-      s.add_development_dependency(%q<shoulda>, [">= 0"])
-      s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
+      s.add_runtime_dependency(%q<active_record_content_blob>, [">= 0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0"])
-      s.add_development_dependency(%q<jeweler>, ["~> 1.8.7"])
-      s.add_development_dependency(%q<rcov>, ["= 0.9.11"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
+      s.add_development_dependency(%q<rspec>, [">= 0"])
+      s.add_development_dependency(%q<mysql2>, [">= 0"])
+      s.add_development_dependency(%q<pry>, [">= 0"])
+      s.add_development_dependency(%q<database_cleaner>, [">= 0"])
+      s.add_development_dependency(%q<rails>, ["~> 3.2.14"])
+      s.add_development_dependency(%q<paper_trail>, [">= 0"])
     else
       s.add_dependency(%q<acts-as-taggable-on>, [">= 0"])
       s.add_dependency(%q<aggtive_record>, [">= 0"])
-      s.add_dependency(%q<shoulda>, [">= 0"])
-      s.add_dependency(%q<rdoc>, ["~> 3.12"])
+      s.add_dependency(%q<active_record_content_blob>, [">= 0"])
       s.add_dependency(%q<bundler>, ["~> 1.0"])
-      s.add_dependency(%q<jeweler>, ["~> 1.8.7"])
-      s.add_dependency(%q<rcov>, ["= 0.9.11"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
+      s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<mysql2>, [">= 0"])
+      s.add_dependency(%q<pry>, [">= 0"])
+      s.add_dependency(%q<database_cleaner>, [">= 0"])
+      s.add_dependency(%q<rails>, ["~> 3.2.14"])
+      s.add_dependency(%q<paper_trail>, [">= 0"])
     end
   else
     s.add_dependency(%q<acts-as-taggable-on>, [">= 0"])
     s.add_dependency(%q<aggtive_record>, [">= 0"])
-    s.add_dependency(%q<shoulda>, [">= 0"])
-    s.add_dependency(%q<rdoc>, ["~> 3.12"])
+    s.add_dependency(%q<active_record_content_blob>, [">= 0"])
     s.add_dependency(%q<bundler>, ["~> 1.0"])
-    s.add_dependency(%q<jeweler>, ["~> 1.8.7"])
-    s.add_dependency(%q<rcov>, ["= 0.9.11"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
+    s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<mysql2>, [">= 0"])
+    s.add_dependency(%q<pry>, [">= 0"])
+    s.add_dependency(%q<database_cleaner>, [">= 0"])
+    s.add_dependency(%q<rails>, ["~> 3.2.14"])
+    s.add_dependency(%q<paper_trail>, [">= 0"])
   end
 end
 
