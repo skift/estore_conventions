@@ -46,6 +46,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<acts-as-taggable-on>, [">= 0"])
       s.add_runtime_dependency(%q<aggtive_record>, [">= 0"])
       s.add_runtime_dependency(%q<active_record_content_blob>, [">= 0"])
+      s.add_runtime_dependency(%q<paper_trail>, [">= 0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0"])
       s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
@@ -53,11 +54,11 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<pry>, [">= 0"])
       s.add_development_dependency(%q<database_cleaner>, [">= 0"])
       s.add_development_dependency(%q<rails>, ["~> 3.2.14"])
-      s.add_development_dependency(%q<paper_trail>, [">= 0"])
     else
       s.add_dependency(%q<acts-as-taggable-on>, [">= 0"])
       s.add_dependency(%q<aggtive_record>, [">= 0"])
       s.add_dependency(%q<active_record_content_blob>, [">= 0"])
+      s.add_dependency(%q<paper_trail>, [">= 0"])
       s.add_dependency(%q<bundler>, ["~> 1.0"])
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<rspec>, [">= 0"])
@@ -65,12 +66,12 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<pry>, [">= 0"])
       s.add_dependency(%q<database_cleaner>, [">= 0"])
       s.add_dependency(%q<rails>, ["~> 3.2.14"])
-      s.add_dependency(%q<paper_trail>, [">= 0"])
     end
   else
     s.add_dependency(%q<acts-as-taggable-on>, [">= 0"])
     s.add_dependency(%q<aggtive_record>, [">= 0"])
     s.add_dependency(%q<active_record_content_blob>, [">= 0"])
+    s.add_dependency(%q<paper_trail>, [">= 0"])
     s.add_dependency(%q<bundler>, ["~> 1.0"])
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<rspec>, [">= 0"])
@@ -78,7 +79,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<pry>, [">= 0"])
     s.add_dependency(%q<database_cleaner>, [">= 0"])
     s.add_dependency(%q<rails>, ["~> 3.2.14"])
-    s.add_dependency(%q<paper_trail>, [">= 0"])
   end
 end
 
