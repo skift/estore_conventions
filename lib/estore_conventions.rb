@@ -84,31 +84,55 @@ module EstoreConventions
 
   ############ InstanceMethods
 
-  def archived_attribute(attribute, time_frame=(30.days))
-    # normalize time since we are returning today as a whole day
+  # Note: redone to use PaperTrail.serializer, as reify makes a database call each time
+  # for some reason - Dan
+
+  def archived_attribute(attribute, time_frame = 30.days )
     time_frame = (DateTime.now + 1.day).beginning_of_day - time_frame
+    arr = self.versions.updates.map do |v| 
+      obj = PaperTrail.serializer.load v.object 
 
-    # transform papertrail objects to reify objects
-    a = self.versions.map {|v| v.reify }
+      Hashie::Mash.new(obj)
+    end
 
-    # get rid of nil first version
-    a.compact!
-
-    # add the current object to the array
-    a << self
+    arr << self
 
     # weed out old entries
-    a.delete_if {|x| x.rails_updated_at <= time_frame }
-
-    # sort hash based on key  
-    a.sort_by!{|x| x.rails_updated_at }
+    arr.delete_if{|x| x.rails_updated_at <= time_frame }
 
     # transform reify objects into hash of {date => value}
-    a.reduce({}) do |hsh,val|
+    return arr.reduce({}) do |hsh,val|
       hsh[val.rails_updated_at.strftime('%Y-%m-%d')] = val.send(attribute)
+      
       hsh
     end
   end
+
+  # def archived_attribute(attribute, time_frame=(30.days))
+  #   # normalize time since we are returning today as a whole day
+  #   time_frame = (DateTime.now + 1.day).beginning_of_day - time_frame
+
+  #   # transform papertrail objects to reify objects
+  #   a = self.versions.map {|v| v.reify }
+
+  #   # get rid of nil first version
+  #   a.compact!
+
+  #   # add the current object to the array
+  #   a << self
+
+  #   # weed out old entries
+  #   a.delete_if {|x| x.rails_updated_at <= time_frame }
+
+  #   # sort hash based on key  
+  #   a.sort_by!{|x| x.rails_updated_at }
+
+  #   # transform reify objects into hash of {date => value}
+  #   a.reduce({}) do |hsh,val|
+  #     hsh[val.rails_updated_at.strftime('%Y-%m-%d')] = val.send(attribute)
+  #     hsh
+  #   end
+  # end
 
   def timestamp_attributes_for_create
     super << :rails_created_at
