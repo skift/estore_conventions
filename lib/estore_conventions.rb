@@ -112,18 +112,17 @@ module EstoreConventions
 
   # UNTESTED
   # returns a scalar (Float)
-  def average_change_per_day(attribute, time_frame = 30.days)
-    hsh = archived_attribute(attribute, time_frame)
-    values = hsh.values
+  def historical_rate_per_day(attribute, time_frame = 30.days)
+    arr = archived_attribute(attribute, time_frame).to_a
+    first_day, xval = arr[0]
+    last_day, yval = arr[1]
 
-    total = 0
-    values.each_with_index do |val, idx|
-      if idx > 0
-        total += val.to_f - arr[idx - 1].to_f
-      end
-    end
+    days = (Time.parse(last_day) - Time.parse(first_day)) / ( 60 * 60 * 24)
+    diff = yval - xval
 
-    return total / values.count.to_f
+    average_diff_per_day = diff.to_f / (days - 1)    
+
+    return average_diff_per_day
   end
 
 
