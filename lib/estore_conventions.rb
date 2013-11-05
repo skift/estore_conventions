@@ -87,6 +87,7 @@ module EstoreConventions
   # Note: redone to use PaperTrail.serializer, as reify makes a database call each time
   # for some reason - Dan
 
+  # returns a Hash, with days as the keys: {'2013-10-12' => 100}
   def archived_attribute(attribute, time_frame = 30.days )
     time_frame = (DateTime.now + 1.day).beginning_of_day - time_frame
     arr = self.versions.updates.map do |v| 
@@ -107,6 +108,24 @@ module EstoreConventions
       hsh
     end
   end
+
+
+  # UNTESTED
+  # returns a scalar (Float)
+  def average_change_per_day(attribute, time_frame = 30.days)
+    hsh = archived_attribute(attribute, time_frame)
+    values = hsh.values
+
+    total = 0
+    values.each_with_index do |val, idx|
+      if idx > 0
+        total += val.to_f - arr[idx - 1].to_f
+      end
+    end
+
+    return total / values.count.to_f
+  end
+
 
   # def archived_attribute(attribute, time_frame=(30.days))
   #   # normalize time since we are returning today as a whole day
