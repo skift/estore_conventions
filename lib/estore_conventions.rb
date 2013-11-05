@@ -122,9 +122,13 @@ module EstoreConventions
 
     day_span = day_count - 1
 
-    average_diff_per_day = (day_span > 0) ? diff.to_f / (days - 1) : 0   
+    if day_span > 0
+      rate = diff.to_f / day_span
+    else
+      rate = 0
+    end
 
-    return average_diff_per_day
+    return rate
   end
 
 
