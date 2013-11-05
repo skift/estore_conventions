@@ -112,12 +112,21 @@ module EstoreConventions
 
   # UNTESTED
   # returns a scalar (Float)
+  #   
+  #
   def historical_rate_per_day(attribute, time_frame = 30.days)
     arr = archived_attribute(attribute, time_frame).to_a
-    first_day, xval = arr[0]
-    last_day, yval = arr[-1]
+    # find first entry that has a number
+    first_day, xval = arr.find{|v| v[1].is_a?(Numeric)} 
+    # find last entry that has a number
+    last_day, yval = arr.reverse.find{|v| v[1].is_a?(Numeric)} 
 
-    day_count = (Time.parse(last_day) - Time.parse(first_day)) / ( 60 * 60 * 24).to_f
+    first_day = Time.parse(first_day) rescue nil
+    last_day = Time.parse(last_day) rescue nil
+
+    return nil unless first_day.nil? || last_day.nil?
+
+    day_count = (last_day - first_day) / ( 60 * 60 * 24).to_f
     diff = yval - xval
 
     day_span = day_count - 1
