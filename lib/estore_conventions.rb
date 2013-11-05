@@ -115,12 +115,14 @@ module EstoreConventions
   def historical_rate_per_day(attribute, time_frame = 30.days)
     arr = archived_attribute(attribute, time_frame).to_a
     first_day, xval = arr[0]
-    last_day, yval = arr[1]
+    last_day, yval = arr[-1]
 
-    days = (Time.parse(last_day) - Time.parse(first_day)) / ( 60 * 60 * 24)
+    day_count = (Time.parse(last_day) - Time.parse(first_day)) / ( 60 * 60 * 24).to_f
     diff = yval - xval
 
-    average_diff_per_day = diff.to_f / (days - 1)    
+    day_span = day_count - 1
+
+    average_diff_per_day = (day_span > 0) ? diff.to_f / (days - 1) : 0   
 
     return average_diff_per_day
   end
