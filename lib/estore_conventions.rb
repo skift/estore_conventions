@@ -124,7 +124,7 @@ module EstoreConventions
     first_day = Time.parse(first_day) rescue nil
     last_day = Time.parse(last_day) rescue nil
 
-    return nil unless first_day.nil? || last_day.nil?
+    return nil if first_day.nil? || last_day.nil?
 
     day_count = (last_day - first_day) / ( 60 * 60 * 24).to_f
     diff = yval - xval
