@@ -39,7 +39,7 @@ module EstoreConventions
       else
         record = self.where(identifier_conditions).first_or_initialize
       end
-      record.assign_attributes(atts_hash)
+      record.assign_attributes(atts_hash, :without_protection => true)
 
       if block_given?
         yield record, full_data_object
