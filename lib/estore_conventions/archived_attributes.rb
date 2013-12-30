@@ -23,7 +23,7 @@ module EstoreConventions
 
       # throw in most recent record
       arr << self
-
+      
       # weed out old entries
       arr.keep_if{|x| time_frame.cover?(x.rails_updated_at) }
 
