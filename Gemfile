@@ -26,4 +26,5 @@ group :development, :test do
   gem "pry"
   gem "database_cleaner"
   gem 'rails', "~> 3.2.14"
+  gem 'timecop'
 end
