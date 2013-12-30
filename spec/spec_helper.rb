@@ -7,6 +7,7 @@ require 'mysql2'
 require 'active_record'
 require 'database_cleaner'
 require 'pry'
+require 'timecop'
 
 require 'estore_conventions'
 require 'spec_dummy_model'

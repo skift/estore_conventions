@@ -34,5 +34,7 @@ end
 class MusicRecord < ActiveRecord::Base 
   include EstoreConventions
   has_paper_trail 
+
+#  attr_accessible :quantity, :price, :genre 
   attr_datetime :published_at
 end
