@@ -1,17 +1,38 @@
 require 'paper_trail'
+require 'hashie'
+
 module EstoreConventions
   module ArchivedAttributes
     extend ActiveSupport::Concern
 
+    DEFAULT_NUM_DAYS_START = 30
+    DEFAULT_NUM_DAYS_END = 1
 
-    # a convenience method
+    DEFAULT_DAY_SPAN = (DEFAULT_NUM_DAYS_START - DEFAULT_NUM_DAYS_END) + 1
+    
+    DEFAULT_DAYS_START = DEFAULT_NUM_DAYS_START.days
+    DEFAULT_DAYS_END = DEFAULT_NUM_DAYS_END.day
+
+    # a convenience method  
+    # takes in an obj that has :rails_updated_at, either a EstoreConventional record
+    #  or a Hashie::Mash
+    #
     # returns a String in YYYY-MM-DD format
-    def archived_date_str 
-      rails_updated_at.strftime('%Y-%m-%d')
+    # awkward construction (acts on an object, rather than takes a message) is because
+    # hashie object may be involved...
+    def archived_date_str(obj=nil) 
+      if obj 
+        if d = obj.rails_updated_at
+          return d.strftime('%Y-%m-%d')
+        end
+      else
+        # assume acting on self
+        return self.rails_updated_at.strftime('%Y-%m-%d')
+      end
     end
 
     # returns a Hash, with days as the keys: {'2013-10-12' => 100}
-    def archived_attribute(attribute, start_time = 30.days.ago, end_time = 1.day.ago )
+    def archived_attribute(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago )
 
       time_frame = (start_time.beginning_of_day)..end_time
 
@@ -23,13 +44,14 @@ module EstoreConventions
 
       # throw in most recent record
       arr << self
-      
+
       # weed out old entries
       arr.keep_if{|x| time_frame.cover?(x.rails_updated_at) }
 
       # transform reify objects into hash of {date => value}
-      return arr.reduce({}) do |hsh, val|
-        hsh[val.archived_date_str] = val.send(attribute)
+      # obj is either Hashie::Mash or Record
+      return arr.reduce({}) do |hsh, obj|
+        hsh[archived_date_str(obj)] = obj.send(attribute)
         
         hsh
       end
@@ -39,9 +61,13 @@ module EstoreConventions
     # not tested
     # very convoluted method that tries to do some extrapolation for missing days
     # returns a hash in which each value is a *delta* of values
-    def archived_attribute_delta_by_day(attribute, start_time = 30.days.ago, end_time = 1.day.ago)
+    def archived_attribute_delta_by_day(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
       hsh = archived_attribute(attribute, start_time, end_time)
 
+      # return an empty array if no updates made
+      return {} if hsh.count == 1
+
+      # BAD EXTRAPOLATION
       # TK: inefficient database call that happens twice
       avg_rate = historical_rate_per_day(attribute, start_time, end_time)
 
@@ -49,8 +75,9 @@ module EstoreConventions
       # if first val is nil, then find the extrapolated difference from the
       #   average val * days
       #   with a minimum of 0
-      first_valid_val = hsh.values.first || [last_valid_val - num_of_days_total * avg_rate, 0 ].max
       last_valid_val = hsh.values.compact.last
+      first_valid_val = hsh.values.first || [last_valid_val - num_of_days_total * avg_rate, 0 ].max
+      
       
       # contains the entire date range, as the archived_attribute may be missing some days
       RailsDateRange(start_time..end_time, {days: 1}) do |val|
@@ -87,7 +114,7 @@ module EstoreConventions
     # returns a scalar (Float)
     #   
     #
-    def historical_rate_per_day(attribute, start_time = 30.days.ago, end_time = 1.day.ago)
+    def historical_rate_per_day(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
       arr = archived_attribute(attribute, start_time, end_time).to_a
       # find first entry that has a number
       first_day, xval = arr.find{|v| v[1].is_a?(Numeric)} 
