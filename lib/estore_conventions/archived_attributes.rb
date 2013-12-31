@@ -57,15 +57,32 @@ module EstoreConventions
       end
     end
 
+    def archived_attribute_delta_by_day_raw(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
+
+      hsh = archived_attribute(attribute, start_time, end_time)
+
+      # return an empty array if no updates made
+      return {} if hsh.count == 1
+
+            
+      # contains the entire date range, as the archived_attribute may be missing some days
+      RailsDateRange(start_time..end_time, {days: 1}) do |val|
+        day_val = val.strftime '%Y-%m-%d'
+
+        hsh[day_val] ||= nil
+      end
+
+      return hsh
+    end
+
 
     # not tested
     # very convoluted method that tries to do some extrapolation for missing days
     # returns a hash in which each value is a *delta* of values
     def archived_attribute_delta_by_day(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
-      hsh = archived_attribute(attribute, start_time, end_time)
-
-      # return an empty array if no updates made
-      return {} if hsh.count == 1
+      
+      hsh = archived_attribute_delta_by_day_raw(attribute, start_time, end_time)
+      return hsh if hsh.empty? #SMELLY
 
       # BAD EXTRAPOLATION
       # TK: inefficient database call that happens twice
@@ -75,16 +92,11 @@ module EstoreConventions
       # if first val is nil, then find the extrapolated difference from the
       #   average val * days
       #   with a minimum of 0
+
+
       last_valid_val = hsh.values.compact.last
       first_valid_val = hsh.values.first || [last_valid_val - num_of_days_total * avg_rate, 0 ].max
-      
-      
-      # contains the entire date range, as the archived_attribute may be missing some days
-      RailsDateRange(start_time..end_time, {days: 1}) do |val|
-        day_val = val.strftime '%Y-%m-%d'
 
-        hsh[day_val] ||= nil
-      end
 
       # now convert hash to Array and sort by key
       arr = hsh.to_a.sort_by{|a| a[0]}
