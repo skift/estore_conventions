@@ -62,66 +62,94 @@ module EstoreConventions
     def archived_attribute_with_filled_days(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
 
       hsh = archived_attribute(attribute, start_time, end_time)
+      nhsh = {}
             
       # contains the entire date range, as the archived_attribute may be missing some days
       RailsDateRange(start_time..end_time, {days: 1}) do |val|
         day_val = val.strftime '%Y-%m-%d'
 
-        hsh[day_val] ||= nil
+        nhsh[day_val] = hsh[day_val]
       end
 
-      return hsh
+      return nhsh
     end
 
-    def raw_archived_attribute_delta_by_day(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
 
-
-    end
 
     # not tested
     # very convoluted method that tries to do some extrapolation for missing days
     # returns a hash in which each value is a *delta* of values
     def archived_attribute_delta_by_day(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
-      
-      hsh = raw_archived_attribute_delta_by_day(attribute, start_time, end_time)
-      return hsh if hsh.empty? #SMELLY
+          
+      hsh = archived_attribute_with_filled_days(attribute, start_time, end_time)
+
+      ## now lets iterate and build a new Hash with interpolated values
+
+      prev_valid_val = nil
+      nil_vals = []
+
+      interpolated_hash = hsh.inject({}) do |nhash, (k,v)|
+        nhash[k] = nil
+        nil_vals << k
+
+        if v.present?          
+          if prev_valid_val.present?
+            # endpoint found
+            # calculate values
+            c = nil_vals.count
+            delta = (v - prev_valid_val) / c.to_f
+            # interpolate
+
+            while q = nil_vals.shift
+              puts "Shifted: #{q} and set equal to #{delta}"
+              nhash[q] = delta
+            end
+          end
+
+          prev_valid_val = v
+        end         
+
+        nhash
+      end
+
+      return interpolated_hash
 
       # BAD EXTRAPOLATION
       # TK: inefficient database call that happens twice
-      avg_rate = historical_rate_per_day(attribute, start_time, end_time)
+      # avg_rate = historical_rate_per_day(attribute, start_time, end_time)
 
-      num_of_days_total = (start_time - end_time).ceil / ( 60 * 60 * 24 )
+#      num_of_days_total = (start_time - end_time).ceil / ( 60 * 60 * 24 )
       # if first val is nil, then find the extrapolated difference from the
       #   average val * days
       #   with a minimum of 0
 
 
-      last_valid_val = hsh.values.compact.last
-      first_valid_val = hsh.values.first || [last_valid_val - num_of_days_total * avg_rate, 0 ].max
+      # last_valid_val = hsh.values.compact.last
+      # first_valid_val = hsh.values.first || [last_valid_val - num_of_days_total * avg_rate, 0 ].max
 
 
-      # now convert hash to Array and sort by key
-      arr = hsh.to_a.sort_by{|a| a[0]}
+      # # now convert hash to Array and sort by key
+      # arr = hsh.to_a.sort_by{|a| a[0]}
 
-      previous_val = nil
-      new_hash = arr.inject({}) do |h, (day_str, val)|
-        if previous_val.nil?
-          # default extrapolation
-          previous_val = first_valid_val
-          h[day_str] = avg_rate 
-        elsif val.nil?
-          # if current val is nil, then use avg_rate
-          previous_val = previous_val + avg_rate
-          h[day_str] = avg_rate
-        else        
-          h[day_str] = val - previous_val
-          previous_val = val
-        end
+      # previous_val = nil
+      # new_hash = arr.inject({}) do |h, (day_str, val)|
+      #   if previous_val.nil?
+      #     # default extrapolation
+      #     previous_val = first_valid_val
+      #     h[day_str] = avg_rate 
+      #   elsif val.nil?
+      #     # if current val is nil, then use avg_rate
+      #     previous_val = previous_val + avg_rate
+      #     h[day_str] = avg_rate
+      #   else        
+      #     h[day_str] = val - previous_val
+      #     previous_val = val
+      #   end
 
-        h
-      end
+      #   h
+      # end
 
-      return new_hash
+      # return new_hash
     end
 
     # UNTESTED
