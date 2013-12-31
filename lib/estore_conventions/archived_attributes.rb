@@ -114,42 +114,6 @@ module EstoreConventions
 
       return interpolated_hash
 
-      # BAD EXTRAPOLATION
-      # TK: inefficient database call that happens twice
-      # avg_rate = historical_rate_per_day(attribute, start_time, end_time)
-
-#      num_of_days_total = (start_time - end_time).ceil / ( 60 * 60 * 24 )
-      # if first val is nil, then find the extrapolated difference from the
-      #   average val * days
-      #   with a minimum of 0
-
-
-      # last_valid_val = hsh.values.compact.last
-      # first_valid_val = hsh.values.first || [last_valid_val - num_of_days_total * avg_rate, 0 ].max
-
-
-      # # now convert hash to Array and sort by key
-      # arr = hsh.to_a.sort_by{|a| a[0]}
-
-      # previous_val = nil
-      # new_hash = arr.inject({}) do |h, (day_str, val)|
-      #   if previous_val.nil?
-      #     # default extrapolation
-      #     previous_val = first_valid_val
-      #     h[day_str] = avg_rate 
-      #   elsif val.nil?
-      #     # if current val is nil, then use avg_rate
-      #     previous_val = previous_val + avg_rate
-      #     h[day_str] = avg_rate
-      #   else        
-      #     h[day_str] = val - previous_val
-      #     previous_val = val
-      #   end
-
-      #   h
-      # end
-
-      # return new_hash
     end
 
     # UNTESTED
@@ -163,15 +127,15 @@ module EstoreConventions
       # find last entry that has a number
       last_day, yval = arr.reverse.find{|v| v[1].is_a?(Numeric)} 
 
-      first_day = Time.parse(first_day) rescue nil
-      last_day = Time.parse(last_day) rescue nil
+      first_day = Time.parse(first_day).beginning_of_day rescue nil
+      last_day = Time.parse(last_day).beginning_of_day rescue nil
 
       return nil if first_day.nil? || last_day.nil?
 
       day_count = (last_day - first_day) / ( 60 * 60 * 24).to_f
       diff = yval - xval
 
-      day_span = day_count - 1
+      day_span = day_count
 
       if day_span > 0
         rate = diff.to_f / day_span
