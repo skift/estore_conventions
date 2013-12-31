@@ -112,7 +112,58 @@ module EstoreConventions
     end
 
 
-    describe '#archived_attribute_delta_by_day', focus: true do
+    describe '#archived_attribute_with_filled_days', focus: true do
+      it 'creates a Hash with keys for all days in the range' do
+        @record = MusicRecord.create(t_id: 'empty', quantity: 9)
+
+        expect(@record.archived_attribute_with_filled_days(:quantity, 5.days.ago, 1.days.ago).count).to eq 5
+      end
+    end
+
+    describe '#raw_archived_attribute_delta_by_day' do
+      before do 
+        Timecop.travel(10.days.ago) do
+          @record = MusicRecord.create(t_id: 'X', quantity: 100)
+        end
+      end
+
+      it 'should be empty if there are 0 updates' do      
+        expect(@record.raw_archived_attribute_delta_by_day(:quantity)).to be_empty
+      end
+
+      context 'just two days for comparison sake' do
+        before do
+          @time_1 = 9.days.ago
+          Timecop.travel(@time_1) do
+            @record.update_attributes({quantity: 200})
+          end
+        end
+
+        it 'should fill out empty days' do
+          deltas = @record.raw_archived_attribute_delta_by_day(:quantity)
+          expect(deltas).to include( { _sdate(@time_1) => 100} )
+          expect(deltas.count).to eq ArchivedAttributes::DEFAULT_DAY_SPAN
+        end
+
+        context 'ten days, one more datapoint' do
+          before do
+            Timecop.travel(9.days.from_now) do
+              @record.update_attributes({quantity: 300})
+            end
+          end
+
+          it 'should only contain two non-zero datapoints' do
+            @deltas = @record.raw_archived_attribute_delta_by_day(:quantity)
+            expect(@deltas.to_a.reject{|a| a[1].nil?}.count).to eq 2
+          end
+        end
+
+      end
+    end
+
+
+
+    describe '#archived_attribute_delta_by_day' do
       before do 
         Timecop.travel(10.days.ago) do
           @record = MusicRecord.create(t_id: 'X', quantity: 100)
