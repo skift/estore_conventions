@@ -72,6 +72,18 @@ describe 'Enumerable extensions for STD' do
       end
     end
 
+    context 'negative sigmas' do
+      before do
+        @hsh = {a: 100, b: 100, c: 100, d: 100, e: -300, f: 500, g:100, h:100}
+      end
+
+      it 'should include negative sigmas by default' do
+        outliers = @hsh.outliers(1.0)
+        expect(outliers[:e][:sigma] <= -1.0).to be_true
+        expect(outliers[:f][:sigma] >= 1.0).to be_true
+      end
+
+    end
 
     context 'optional arguments' do
       before do
@@ -82,8 +94,6 @@ describe 'Enumerable extensions for STD' do
         expect(@hsh.outliers(0.0).keys).to eq @hsh.keys
 
       end
-
-
     end
   end
 

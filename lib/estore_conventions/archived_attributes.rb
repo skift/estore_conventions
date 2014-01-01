@@ -34,17 +34,21 @@ module EstoreConventions
     # returns a Hash, with days as the keys: {'2013-10-12' => 100}
     def archived_attribute(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago )
 
-      time_frame = (start_time.beginning_of_day)..end_time
-
       arr = self.versions.updates.map do |v| 
         obj = PaperTrail.serializer.load v.object 
 
         Hashie::Mash.new(obj)
       end
 
-      # throw in most recent record
+      # throw in current record
       arr << self
 
+      start_time ||= arr.first.rails_updated_at
+      end_time ||= arr.last.rails_updated_at
+
+      time_frame = (start_time.beginning_of_day)..end_time
+
+      # TODO: Make this more efficient
       # weed out old entries
       arr.keep_if{|x| time_frame.cover?(x.rails_updated_at) }
 
@@ -101,7 +105,6 @@ module EstoreConventions
             # interpolate
 
             while q = nil_vals.shift
-              puts "Shifted: #{q} and set equal to #{delta}"
               nhash[q] = delta
             end
           end

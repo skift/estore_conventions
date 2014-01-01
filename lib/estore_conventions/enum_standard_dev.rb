@@ -19,17 +19,24 @@ module Enumerable
   end
 
   # returns:
-  # [{value: 10, sigma: 2.1}]
+  #  if Array: [{value: 10, sigma: 2.1}]
+  #  if Hash: {key: {value: 10, sigma: 2.1}}
+  #
+  # args:
+  #  min_sigma(Float) - minimum number of standard deviations (>=)
+  #  opts(Hash) - not currently used
+
   def outliers(min_sigma = 2.0, opts = {})
     the_values = self.is_a?(Hash) ? self.values : self
     the_std = the_values.standard_deviation
     the_mean = the_values.e_mean
 
     coll = self.map do |v|
-      val,key = Array(v).reverse
-      val_sig = ((val - the_mean) / the_std).abs
-      
-      if z = ( val_sig >= min_sigma ? {value: val, sigma: val_sig} : nil )
+      val, key = Array(v).reverse
+      val_sigma = ((val - the_mean) / the_std)
+      # if val_sigma passes threshold, then create a Hash, else, return nil
+      if z = ( val_sigma.abs >= min_sigma.abs ? {value: val, sigma: val_sigma} : nil )
+      # if key is not nil? (i.e. self is a Hash), wrap it in an Array
         z = [key, z] unless key.nil?
       end
 

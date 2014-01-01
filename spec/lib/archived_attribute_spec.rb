@@ -96,7 +96,39 @@ module EstoreConventions
               }
             )
           end        
+        end        
+      end
+
+      context 'bounds' do 
+        before do
+          Timecop.travel(1000.days.ago){
+            @record = MusicRecord.create(t_id: 'ZZZ1', quantity: 10)    
+          }
+          Timecop.travel(20.days.ago){ @record.update_attributes(quantity: 20) }
+          Timecop.travel(5.days.ago){ @record.update_attributes(quantity: 40) }
+          @record.update_attributes(quantity: 140)
         end
+
+        it 'should include all versions if both time args are nil' do
+          expect(@record.archived_attribute(:quantity, nil, nil).count).to eq 4
+        end
+
+        it 'should include all past if first time args is nil' do
+          outliers = @record.archived_attribute(:quantity, nil)
+          expect(outliers.count).to eq 3
+          expect(outliers.to_a.first[1]).to eq 10
+           expect(outliers.to_a.last[1]).to eq 40
+        end
+
+        it 'should include records up to now if second time args is nil' do
+          outliers = @record.archived_attribute(:quantity, 30.days.ago, nil)
+          expect(outliers.count).to eq 3
+          expect(outliers.to_a.first[1]).to eq 20
+          expect(outliers.to_a.last[1]).to eq 140
+        end
+
+
+
       end
 
 
