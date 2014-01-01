@@ -1,5 +1,7 @@
+
 require 'aggtive_record'
 require 'acts-as-taggable-on'
+require_relative 'estore_conventions/enum_standard_dev'
 require_relative 'estore_conventions/archived_attributes'
 require_relative 'estore_conventions/rails_date_range'
 
