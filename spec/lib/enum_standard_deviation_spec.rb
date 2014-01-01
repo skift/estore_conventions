@@ -71,6 +71,20 @@ describe 'Enumerable extensions for STD' do
         expect(arr[-1]).to eq [:g, {value:40, sigma: 2.0225995873897262}]
       end
     end
+
+
+    context 'optional arguments' do
+      before do
+        @hsh = {a: 10, b: 10, c: 10, d: 10, e: 10, f: 40, g: 40, h: 10, i: 10, j: 10, k: 10}
+      end
+
+      it 'uses first arg to define sigma' do
+        expect(@hsh.outliers(0.0).keys).to eq @hsh.keys
+
+      end
+
+
+    end
   end
 
 

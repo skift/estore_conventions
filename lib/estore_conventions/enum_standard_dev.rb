@@ -21,32 +21,23 @@ module Enumerable
   # returns:
   # [{value: 10, sigma: 2.1}]
   def outliers(min_sigma = 2.0, opts = {})
-    if self.is_a?(Array)
-      std = standard_deviation
-      mean = e_mean
-      return self.map{ |val|
-        val_sig = (val - mean) / std
-        if val_sig > min_sigma
-          {value: val, sigma: val_sig}
-        else
-          nil
-        end
-      }.compact
-    else # assume hash keys
-      the_std = self.values.standard_deviation
-      the_mean = self.values.e_mean
+    the_values = self.is_a?(Hash) ? self.values : self
+    the_std = the_values.standard_deviation
+    the_mean = the_values.e_mean
 
-      return Hash[self.map{ |(k,val)| 
-        val_sig = (val - the_mean) / the_std
-        if val_sig > min_sigma
-          [k, {value: val, sigma: val_sig}]
-        else
-          nil
-        end
-      }.compact]
+    coll = self.map do |v|
+      val,key = Array(v).reverse
+      val_sig = ((val - the_mean) / the_std).abs
+      
+      if z = ( val_sig >= min_sigma ? {value: val, sigma: val_sig} : nil )
+        z = [key, z] unless key.nil?
+      end
+
+      z
     end
+    coll = coll.compact
 
-
+    return self.is_a?(Hash) ? Hash[coll] : coll
   end
 
 end 
