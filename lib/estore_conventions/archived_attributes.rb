@@ -66,6 +66,11 @@ module EstoreConventions
     def archived_attribute_with_filled_days(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
 
       hsh = archived_attribute(attribute, start_time, end_time)
+      # if start_time or end_time is nil, then we have to set them to what hsh found
+      unless hsh.empty? # unconfident code?
+        start_time = Time.parse hsh.keys.first if start_time.nil?
+        end_time = Time.parse hsh.keys.last if end_time.nil?
+      end
       nhsh = {}
             
       # contains the entire date range, as the archived_attribute may be missing some days
@@ -116,7 +121,6 @@ module EstoreConventions
       end
 
       return interpolated_hash
-
     end
 
     # UNTESTED

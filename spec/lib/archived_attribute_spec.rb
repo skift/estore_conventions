@@ -99,6 +99,17 @@ module EstoreConventions
         end        
       end
 
+      context 'no updates have yet been made' do
+        it 'should return Hash with one value' do
+          Timecop.travel(3.days.ago) do
+            @x = MusicRecord.create(t_id: 'X-FLOW', quantity: 5)
+          end
+
+          expect(@x.archived_attribute(:quantity)).to eq( { @x.archived_date_str => 5 } )
+        end
+      end
+
+
       context 'bounds' do 
         before do
           Timecop.travel(1000.days.ago){
@@ -114,33 +125,34 @@ module EstoreConventions
         end
 
         it 'should include all past if first time args is nil' do
-          outliers = @record.archived_attribute(:quantity, nil)
-          expect(outliers.count).to eq 3
-          expect(outliers.to_a.first[1]).to eq 10
-           expect(outliers.to_a.last[1]).to eq 40
+          atts = @record.archived_attribute(:quantity, nil).to_a
+          expect(atts.count).to eq 3
+          expect(atts.first[1]).to eq 10
+           expect(atts.last[1]).to eq 40
         end
 
         it 'should include records up to now if second time args is nil' do
-          outliers = @record.archived_attribute(:quantity, 30.days.ago, nil)
-          expect(outliers.count).to eq 3
-          expect(outliers.to_a.first[1]).to eq 20
-          expect(outliers.to_a.last[1]).to eq 140
+          atts = @record.archived_attribute(:quantity, 30.days.ago, nil).to_a
+          expect(atts.count).to eq 3
+          expect(atts.first[1]).to eq 20
+          expect(atts.last[1]).to eq 140
         end
 
-
-
-      end
-
-
-      context 'no updates have yet been made' do
-        it 'should return Hash with one value' do
-          Timecop.travel(3.days.ago) do
-            @x = MusicRecord.create(t_id: 'X-FLOW', quantity: 5)
+        context 'works with archived_attribute_with_filled_days' do
+          it 'should just use first/last historical version for nil' do
+            atts = @record.archived_attribute_with_filled_days(:quantity, nil, nil).to_a
+            expect(atts.first[1]).to eq 10
+            expect(atts.last[1]).to eq 140
+            expect(atts.count >= 1000).to be_true
           end
-
-          expect(@x.archived_attribute(:quantity)).to eq( { @x.archived_date_str => 5 } )
         end
+
+
+
       end
+
+
+      
     end
 
 
