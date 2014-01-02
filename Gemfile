@@ -6,7 +6,7 @@ source "http://rubygems.org"
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 
-gem "acts-as-taggable-on"
+gem "acts-as-taggable-on", "~> 2.4.1"
 
 # a small framework of aggregation-by-time periods for ActiveRecord
 gem "aggtive_record"

@@ -149,7 +149,7 @@ PLATFORMS
 DEPENDENCIES
   active_record_content_blob
   activesupport (~> 3.2.14)
-  acts-as-taggable-on
+  acts-as-taggable-on (~> 2.4.1)
   aggtive_record
   bundler (~> 1.0)
   database_cleaner
