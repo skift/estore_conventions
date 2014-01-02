@@ -3,6 +3,7 @@ require 'aggtive_record'
 require 'acts-as-taggable-on'
 require_relative 'estore_conventions/enum_standard_dev'
 require_relative 'estore_conventions/archived_attributes'
+require_relative 'estore_conventions/archived_outliers'
 require_relative 'estore_conventions/rails_date_range'
 
 ActsAsTaggableOn.force_lowercase = true
@@ -12,7 +13,7 @@ module EstoreConventions
   extend ActiveSupport::Concern
   include AggtiveRecord::Aggable
   include EstoreConventions::ArchivedAttributes
-
+  include EstoreConventions::ArchivedOutliers
 
   included do
     class_attribute :t_id_attribute

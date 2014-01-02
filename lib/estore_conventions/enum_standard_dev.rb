@@ -1,6 +1,8 @@
 module Enumerable
   def e_sum
-    self.inject(0){|accum, i| accum + i }
+    col = self.is_a?(Hash) ? self.values : self
+
+    col.inject(0){|accum, i| accum + i }
   end
 
   def e_mean
@@ -8,8 +10,9 @@ module Enumerable
   end
 
   def sample_variance
-    m = self.e_mean
-    a_sum = self.inject(0){|a, i| a + (i - m)**2 }
+    col = self.is_a?(Hash) ? self.values : self
+
+    a_sum = col.inject(0){|a, i| a + (i - self.e_mean)**2 }
 
     a_sum/(self.length - 1).to_f
   end
@@ -27,9 +30,8 @@ module Enumerable
   #  opts(Hash) - not currently used
 
   def outliers(min_sigma = 2.0, opts = {})
-    the_values = self.is_a?(Hash) ? self.values : self
-    the_std = the_values.standard_deviation
-    the_mean = the_values.e_mean
+    the_std = self.standard_deviation
+    the_mean = self.e_mean
 
     coll = self.map do |v|
       val, key = Array(v).reverse

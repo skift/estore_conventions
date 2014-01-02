@@ -121,7 +121,10 @@ module EstoreConventions
         end
 
         it 'should include all versions if both time args are nil' do
-          expect(@record.archived_attribute(:quantity, nil, nil).count).to eq 4
+          atts = @record.archived_attribute :quantity, nil, nil
+          expect(atts.count).to eq 4
+          expect(atts.keys.first).to eq _sdate(1000.days.ago)
+          expect(atts.keys.last).to eq _sdate(Time.now)
         end
 
         it 'should include all past if first time args is nil' do

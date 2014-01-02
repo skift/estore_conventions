@@ -3,7 +3,7 @@ require 'spec_helper'
 include EstoreConventions::Builder
 describe EstoreConventions::Builder do 
 
-  before(:each) do 
+  before do 
     @record = MusicRecord.create t_id: "Alpha", genre: "Quiet"
     @data_object = {id: "Alpha", genre: "Loud", published_at: "2009-10-29", quantity: 12, price: 4.42, 
       an_unused_attribute: "N/A" }
