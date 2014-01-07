@@ -1,3 +1,4 @@
+require 'interpolate'
 
 require 'aggtive_record'
 require 'acts-as-taggable-on'

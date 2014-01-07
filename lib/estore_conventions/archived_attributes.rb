@@ -31,8 +31,9 @@ module EstoreConventions
       end
     end
 
-    # returns a Hash, with days as the keys: {'2013-10-12' => 100}
-    def archived_attribute(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago )
+
+
+    def archived_attribute_base(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago, &blk )
 
       arr = self.versions.updates.map do |v| 
         obj = PaperTrail.serializer.load v.object 
@@ -49,78 +50,112 @@ module EstoreConventions
       time_frame = (start_time.beginning_of_day)..end_time
 
       # TODO: Make this more efficient
-      # weed out old entries
-      arr.keep_if{|x| time_frame.cover?(x.rails_updated_at) }
+      # should just bring in as few as values as possible
+
+
+#      arr.keep_if{|x| time_frame.cover?(x.rails_updated_at) }
 
       # transform reify objects into hash of {date => value}
       # obj is either Hashie::Mash or Record
-      return arr.reduce({}) do |hsh, obj|
+
+      rblk =  block_given? ? blk : ->(hsh, obj){
         hsh[archived_date_str(obj)] = obj.send(attribute)
         
+        hsh
+      }
+
+
+      att_hash = arr.reduce({}){ |hsh, obj|  
+        rblk.call( hsh, obj)
+      }
+
+
+      return att_hash
+    end
+
+
+    # temp method, for prototyping
+    def archive_attributes_utc(attribute,start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
+      archived_attribute_base(attribute, start_time, end_time) do |hsh, obj|
+        hsh[obj.rails_updated_at.to_i] = obj.send(attribute)
+
+        hsh
+      end
+    end
+
+    # temp method, for prototyping
+    # save as above, except the keys are Time objects
+    def archive_attributes_by_time(attribute,start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
+      archived_attribute_base(attribute, start_time, end_time) do |hsh, obj|
+        hsh[obj.rails_updated_at] = obj.send(attribute)
+
         hsh
       end
     end
 
 
 
-    def archived_attribute_with_filled_days(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
+    ## TO BE DEPRECATED SOON
+    # returns a Hash, with days as the keys: {'2013-10-12' => 100}
+    def archived_attribute(*args)
+      archived_attribute_by_day(*args)
+    end
+    
 
-      hsh = archived_attribute(attribute, start_time, end_time)
-      # if start_time or end_time is nil, then we have to set them to what hsh found
-      unless hsh.empty? # unconfident code?
-        start_time = Time.parse hsh.keys.first if start_time.nil?
-        end_time = Time.parse hsh.keys.last if end_time.nil?
-      end
-      nhsh = {}
+
+# NO
+
+    # def archived_attribute_with_filled_days(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
+
+    #   hsh = archived_attribute(attribute, start_time, end_time)
+    #   # if start_time or end_time is nil, then we have to set them to what hsh found
+    #   unless hsh.empty? # unconfident code?
+    #     start_time = Time.parse hsh.keys.first if start_time.nil?
+    #     end_time = Time.parse hsh.keys.last if end_time.nil?
+    #   end
+    #   nhsh = {}
             
-      # contains the entire date range, as the archived_attribute may be missing some days
-      RailsDateRange(start_time..end_time, {days: 1}) do |val|
-        day_val = val.strftime '%Y-%m-%d'
+    #   # contains the entire date range, as the archived_attribute may be missing some days
+    #   RailsDateRange(start_time..end_time, {days: 1}) do |val|
+    #     day_val = val.strftime '%Y-%m-%d'
 
-        nhsh[day_val] = hsh[day_val]
+    #     nhsh[day_val] = hsh[day_val]
+    #   end
+
+    #   return nhsh
+    # end
+
+
+    def archived_attribute_by_day(attribute,start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
+      #     hsh = archive_attributes_utc(attribute, start_time, end_time)
+      hsh = archive_attributes_utc(attribute, nil, nil)
+      # NOTE: hsh essentially contains EVERYTHING so that we can interpolate
+
+      ## This is where we limit what's actually returned
+      time_x = Time.at( [start_time.to_i, hsh.keys.first].max).beginning_of_day 
+      time_y = Time.at( [(end_time || Time.now).to_i , hsh.keys.last].min    ).beginning_of_day 
+      time_range = time_x..time_y
+
+      days = RailsDateRange(time_range, {days: 1})
+      interpolation = Interpolate::Points.new(hsh)
+
+      interpolated_arr = if block_given? 
+        yield days, interpolation
+      else
+        days.map{|d| [Time.at(d).strftime('%Y-%m-%d'), interpolation.at(d.to_i) ] }
       end
 
-      return nhsh
+      return Hash[interpolated_arr]
     end
 
 
-
-    # not tested
-    # very convoluted method that tries to do some extrapolation for missing days
     # returns a hash in which each value is a *delta* of values
     def archived_attribute_delta_by_day(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
-          
-      hsh = archived_attribute_with_filled_days(attribute, start_time, end_time)
-
-      ## now lets iterate and build a new Hash with interpolated values
-
-      prev_valid_val = nil
-      nil_vals = []
-
-      interpolated_hash = hsh.inject({}) do |nhash, (k,v)|
-        nhash[k] = nil
-        nil_vals << k
-
-        if v.present?          
-          if prev_valid_val.present?
-            # endpoint found
-            # calculate values
-            c = nil_vals.count
-            delta = (v - prev_valid_val) / c.to_f
-            # interpolate
-
-            while q = nil_vals.shift
-              nhash[q] = delta
-            end
-          end
-
-          prev_valid_val = v
-        end         
-
-        nhash
+      archived_attribute_by_day(attribute, start_time, end_time) do |days, interpolation|
+        days.map.with_index(1) do |d, i| 
+          [Time.at(d).strftime('%Y-%m-%d'), interpolation.at(days[i].to_i) - interpolation.at(d.to_i) ] if days[i]
+        end
       end
-
-      return interpolated_hash
     end
 
     # UNTESTED

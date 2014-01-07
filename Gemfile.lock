@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/dannguyen/interpolate.git
+  revision: 4f22c0237b7a08df94fb3f7e297a2c1d98188a16
+  specs:
+    interpolate (0.3.0)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -153,6 +159,7 @@ DEPENDENCIES
   aggtive_record
   bundler (~> 1.0)
   database_cleaner
+  interpolate!
   jeweler
   mysql2
   paper_trail

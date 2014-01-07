@@ -16,7 +16,7 @@ gem "active_record_content_blob"
 
 gem 'paper_trail'
 
-
+gem 'interpolate', github: 'dannguyen/interpolate'
 
 group :development, :test do
   gem "bundler", "~> 1.0"
