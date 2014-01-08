@@ -13,6 +13,17 @@ module EstoreConventions
     DEFAULT_DAYS_START = DEFAULT_NUM_DAYS_START.days
     DEFAULT_DAYS_END = DEFAULT_NUM_DAYS_END.day
 
+    included do 
+      class_attribute :archived_time_attribute
+      self.archived_time_attribute = :rails_updated_at
+    end
+
+    
+
+    def archived_time_attribute
+      self.class.archived_time_attribute
+    end
+
     # a convenience method  
     # takes in an obj that has :rails_updated_at, either a EstoreConventional record
     #  or a Hashie::Mash
@@ -22,12 +33,12 @@ module EstoreConventions
     # hashie object may be involved...
     def archived_date_str(obj=nil) 
       if obj 
-        if d = obj.rails_updated_at
+        if d = obj.send( archived_time_attribute)
           return d.strftime('%Y-%m-%d')
         end
       else
         # assume acting on self
-        return self.rails_updated_at.strftime('%Y-%m-%d')
+        return self.send(archived_time_attribute).strftime('%Y-%m-%d')
       end
     end
 
@@ -44,8 +55,8 @@ module EstoreConventions
       # throw in current record
       arr << self
 
-      start_time ||= arr.first.rails_updated_at
-      end_time ||= arr.last.rails_updated_at
+      start_time ||= arr.first.send archived_time_attribute
+      end_time ||= arr.last.send archived_time_attribute
 
       time_frame = (start_time.beginning_of_day)..end_time
 
@@ -77,7 +88,7 @@ module EstoreConventions
     # temp method, for prototyping
     def archive_attributes_utc(attribute,start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
       archived_attribute_base(attribute, start_time, end_time) do |hsh, obj|
-        hsh[obj.rails_updated_at.to_i] = obj.send(attribute)
+        hsh[obj.send(archived_time_attribute).to_i] = obj.send(attribute)
 
         hsh
       end
@@ -87,7 +98,7 @@ module EstoreConventions
     # save as above, except the keys are Time objects
     def archive_attributes_by_time(attribute,start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago)
       archived_attribute_base(attribute, start_time, end_time) do |hsh, obj|
-        hsh[obj.rails_updated_at] = obj.send(attribute)
+        hsh[obj.send(archived_time_attribute)] = obj.send(attribute)
 
         hsh
       end
