@@ -142,6 +142,9 @@ module EstoreConventions
       hsh = archive_attributes_utc(attribute, nil, nil)
       # NOTE: hsh essentially contains EVERYTHING so that we can interpolate
 
+      # remove any nil values
+      hsh.delete_if{ |k, v| k.nil? || v.nil?}
+
       ## This is where we limit what's actually returned
       time_x = Time.at( [start_time.to_i, hsh.keys.first].max).beginning_of_day 
       time_y = Time.at( [(end_time || Time.now).to_i , hsh.keys.last].min    ).beginning_of_day 
