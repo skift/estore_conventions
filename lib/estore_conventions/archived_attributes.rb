@@ -147,7 +147,7 @@ module EstoreConventions
 
       ## This is where we limit what's actually returned
       time_x = Time.at( [start_time.to_i, hsh.keys.first.to_i].max).beginning_of_day 
-      time_y = Time.at( [(end_time || Time.now).to_i , hsh.keys.last].min    ).beginning_of_day 
+      time_y = Time.at( [(end_time || Time.now).to_i , hsh.keys.last.to_i].min    ).beginning_of_day 
       time_range = time_x..time_y
 
       days = RailsDateRange(time_range, {days: 1})
