@@ -146,7 +146,7 @@ module EstoreConventions
       hsh.delete_if{ |k, v| k.nil? || v.nil?}
 
       ## This is where we limit what's actually returned
-      time_x = Time.at( [start_time.to_i, hsh.keys.first].max).beginning_of_day 
+      time_x = Time.at( [start_time.to_i, hsh.keys.first.to_i].max).beginning_of_day 
       time_y = Time.at( [(end_time || Time.now).to_i , hsh.keys.last].min    ).beginning_of_day 
       time_range = time_x..time_y
 
