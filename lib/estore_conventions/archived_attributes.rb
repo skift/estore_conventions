@@ -18,6 +18,23 @@ module EstoreConventions
       self.archived_time_attribute = :rails_updated_at
     end
 
+    ## can be overridden
+    def archives
+      @_thearchives ||= get_archives
+    end
+
+
+    def get_archives 
+      arr = self.versions.updates.map do |v|
+        obj = PaperTrail.serializer.load v.object
+
+        Hashie::Mash.new(obj)
+      end
+      # throw in current record
+      arr << self
+
+      return arr
+    end
     
 
     def archived_time_attribute
@@ -46,14 +63,9 @@ module EstoreConventions
 
     def archived_attribute_base(attribute, start_time = DEFAULT_DAYS_START.ago, end_time = DEFAULT_DAYS_END.ago, &blk )
 
-      arr = self.versions.updates.map do |v| 
-        obj = PaperTrail.serializer.load v.object 
+      
 
-        Hashie::Mash.new(obj)
-      end
-
-      # throw in current record
-      arr << self
+      arr = self.archives
 
       start_time ||= arr.first.send archived_time_attribute
       end_time ||= arr.last.send archived_time_attribute
@@ -200,6 +212,13 @@ module EstoreConventions
       end
 
       return rate
+    end
+
+
+    module ClassMethods
+      def archiver
+
+      end
     end
 
 

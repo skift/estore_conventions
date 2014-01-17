@@ -83,10 +83,4 @@ describe EstoreConventions::ArchivedOutliers do
     end
 
   end
-
-
-
-
-
-
 end
