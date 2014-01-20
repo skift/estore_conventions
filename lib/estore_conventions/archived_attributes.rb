@@ -216,7 +216,8 @@ module EstoreConventions
 
 
     module ClassMethods
-      def archiver
+      def archiver(estore_record)
+        # given an estore_record, get its archives
 
       end
     end
